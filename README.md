@@ -30,6 +30,12 @@ These skills help you think through problems before writing code.
   npx skills@latest add mattpocock/skills/grill-me
   ```
 
+- **daily-work-orchestrator** — Resume from prior handoffs across many workspaces, generate an approval-first daily plan, route likely skills, and capture end-of-day handoffs.
+
+  ```
+  npx skills@latest add mattpocock/skills/daily-work-orchestrator
+  ```
+
 - **design-an-interface** — Generate multiple radically different interface designs for a module.
 
   ```
