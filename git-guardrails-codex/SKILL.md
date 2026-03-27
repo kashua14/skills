@@ -5,7 +5,7 @@ description: Set up Codex-oriented git guardrails by installing a git wrapper th
 
 # Setup Git Guardrails For Codex
 
-Codex does not expose Claude-style `PreToolUse` hooks. For Codex, install a `git` wrapper earlier on `PATH` so dangerous commands are rejected before the real `git` binary runs.
+Codex does not expose pre-command git hooks in the same style as some other coding assistants. For Codex, install a `git` wrapper earlier on `PATH` so dangerous commands are rejected before the real `git` binary runs.
 
 ## What Gets Blocked
 
@@ -25,9 +25,9 @@ Prefer **global** install for Codex because login shells will reliably see `~/.c
 
 If the user wants narrower scope, install **project-only** and explain that repo-local shell setup must be sourced before launching Codex.
 
-### 2. Copy the hook script
+### 2. Copy the wrapper script
 
-The bundled script is at: [scripts/block-dangerous-git.sh](scripts/block-dangerous-git.sh)
+The bundled script is at: [scripts/git-wrapper.sh](scripts/git-wrapper.sh)
 
 Copy it to the target location based on scope:
 
