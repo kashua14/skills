@@ -25,7 +25,12 @@ Use this skill to run a repeatable daily loop across many repos and non-git work
 5. Show a compact summary for every workspace.
 6. Propose a focus shortlist, then let the user approve or edit it interactively.
 7. For workspaces with no existing handoff, switch into the fixed bootstrap pipeline instead of pretending there is prior context.
-8. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
+8. Automatically start the bootstrap kickoff for one selected no-handoff workspace at a time:
+   - ask for the user's top priority
+   - if needed, suggest up to 3 strong candidates
+   - write a planner-side bootstrap brief
+   - generate the launch prompt for the interactive Codex session
+9. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
 
 ## No-handoff bootstrap workflow
 
