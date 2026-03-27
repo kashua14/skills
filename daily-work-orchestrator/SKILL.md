@@ -24,7 +24,28 @@ Use this skill to run a repeatable daily loop across many repos and non-git work
 4. If a model backend is configured, let it refine summaries, next actions, and skill ranking.
 5. Show a compact summary for every workspace.
 6. Propose a focus shortlist, then let the user approve or edit it interactively.
-7. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff.
+7. For workspaces with no existing handoff, switch into the fixed bootstrap pipeline instead of pretending there is prior context.
+8. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
+
+## No-handoff bootstrap workflow
+
+Use this default pipeline one workspace at a time:
+
+1. Do a lightweight scan.
+2. Ask for the user's top priority in the workspace.
+3. If the user has no clear priority, suggest up to 3 strong candidates from:
+   - open issues and PRs first
+   - lightweight repo inspection second
+4. Use `grill-me` to sharpen the chosen problem.
+5. Do deeper targeted inspection.
+6. Use `write-a-prd` when the problem is a larger feature, ambiguous initiative, or needs clearer product/UX scope before issue slicing.
+7. Use `triage-issue` if the problem is one safe vertical slice.
+8. Use `prd-to-issues` if it must split into parent/child issues. If a PRD was needed, derive the issue set from that PRD.
+9. Draft issue(s) with repo templates if present.
+10. Only create GitHub issue(s) after explicit confirmation.
+11. Write the first bootstrap handoff immediately after issue confirmation.
+12. Ask whether to implement now, but do not implement without explicit approval.
+13. Ask separately whether to create a draft PR after implementation.
 
 ## End-day workflow
 
