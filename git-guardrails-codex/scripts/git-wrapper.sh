@@ -2,7 +2,7 @@
 
 COMMAND="$*"
 
-SELF_PATH="${0:A}"
+SELF_PATH="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 REAL_GIT="/usr/bin/git"
 
 if [ ! -x "$REAL_GIT" ]; then
