@@ -46,7 +46,7 @@ Before spawning sub-agents, write a user-facing explanation of the problem space
 - The dependencies it would need to rely on
 - A rough illustrative code sketch to make the constraints concrete — this is not a proposal, just a way to ground the constraints
 
-Show this to the user, then immediately proceed to Step 5. The user reads and thinks about the problem while the sub-agents work in parallel.
+Show this to the user, then proceed to Step 5. If the user explicitly asked for delegated exploration, they can review this framing while those read-only agents work in parallel.
 
 ### 5. Design multiple interfaces
 
