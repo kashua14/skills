@@ -1,6 +1,6 @@
-# Agent Skills
+# Codex Skills
 
-A collection of agent skills that extend capabilities across planning, development, and tooling.
+A collection of Codex-oriented skills that extend capabilities across planning, development, and tooling.
 
 ## Planning & Design
 
