@@ -30,6 +30,8 @@ Use this skill to run a repeatable daily loop across many repos and non-git work
    - if needed, suggest up to 3 strong candidates
    - write a planner-side bootstrap brief
    - generate the launch prompt for the interactive Codex session
+   - launch Codex directly when the environment is interactive and bootstrap auto-launch is enabled
+   - instruct the launched Codex session to begin step 1 immediately and continue step-by-step, only pausing for the user when a step needs input or approval
 9. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
 
 ## No-handoff bootstrap workflow
@@ -51,6 +53,9 @@ Use this default pipeline one workspace at a time:
 11. Write the first bootstrap handoff immediately after issue confirmation.
 12. Ask whether to implement now, but do not implement without explicit approval.
 13. Ask separately whether to create a draft PR after implementation.
+
+Execution rule:
+- Once the bootstrap Codex session starts, it should execute the pipeline immediately instead of merely restating it. It should ask one question at a time during `grill-me`, keep moving between user gates, and stop only for the approvals that the workflow explicitly requires.
 
 ## End-day workflow
 
