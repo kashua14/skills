@@ -66,6 +66,10 @@ Typical mappings:
 - Per workspace:
   - `.codex/session-handoff.md`
 
+`workspaces.yaml` may also include:
+- `group` for related repos such as `ucu`
+- `depends_on` for ordered cross-repo flows such as `ucu-ui` depending on `ucu-api`
+
 ## Guardrails
 
 - The workflow is approval-first.
