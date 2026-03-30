@@ -34,7 +34,8 @@ Use this skill to run a repeatable daily loop across many repos and non-git work
    - instruct the launched Codex session to read the bootstrap brief first and treat it as the source of truth
    - launch Codex directly when the environment is interactive and bootstrap auto-launch is enabled
    - instruct the launched Codex session to begin step 1 immediately and continue step-by-step, only pausing for the user when a step needs input or approval
-9. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
+9. For selected non-bootstrap workspaces, treat the explicitly chosen workspace as the primary launch target even if dependency expansion adds supporting repos.
+10. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
 
 ## Canonical workflow
 
