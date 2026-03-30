@@ -51,6 +51,7 @@ Default execution model:
 
 1. Start from the user-stated problem if they give one. If they do not, inspect the repo and use judgment.
 2. Use `grill-me` to sharpen the problem one question at a time until the problem and intended outcome are clear.
+   - if the user came in with one or more explicit issues, gather enough context to turn them into GitHub issues first
 3. Inspect the repo and existing open work.
    - prioritize unfinished existing issues and PRs first
    - reuse and update existing relevant issues before creating new ones
@@ -68,7 +69,7 @@ Default execution model:
 9. Present the issue set and priority updates for confirmation before creating or updating GitHub issues.
 10. Create or update issues only after approval.
 11. Maintain a planner-side today queue as a derived view, not a separate source of truth.
-12. Rank across repos with this ordered rule set:
+12. After issue creation or update, rank across all relevant GitHub issues for the repo with this ordered rule set:
    - `P0` beats everything
    - unblocks other work beats isolated work
    - existing branch or PR continuation beats brand-new work
@@ -93,11 +94,12 @@ Execution rule:
 Use this bootstrap entrypoint one workspace at a time:
 
 1. Do a lightweight scan.
-2. Ask for the user's top priority in the workspace.
+2. Ask for the user's top issue, issues, or feature in the workspace.
 3. If the user has no clear priority, suggest up to 3 very strong candidates from:
    - open issues and PRs first
    - lightweight repo inspection second
-4. Then continue into the canonical workflow above.
+4. If the user provides explicit issue ideas, use `grill-me` to get enough context to create or update GitHub issues first.
+5. Then continue into the canonical workflow above and rank the highest-priority unblocked issue from the full repo issue set.
 
 ## End-day workflow
 
