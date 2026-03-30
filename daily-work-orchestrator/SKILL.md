@@ -69,22 +69,23 @@ Default execution model:
 9. Present the issue set and priority updates for confirmation before creating or updating GitHub issues.
 10. Create or update issues only after approval.
 11. Maintain a planner-side today queue as a derived view, not a separate source of truth.
-12. After issue creation or update, rank across all relevant GitHub issues for the repo with this ordered rule set:
+12. After issue creation or update, rank across relevant GitHub issues assigned to the authenticated GitHub user first with this ordered rule set:
    - `P0` beats everything
    - unblocks other work beats isolated work
    - existing branch or PR continuation beats brand-new work
    - user-stated problem can override with explicit confirmation
    - otherwise use workspace priority
-13. Present the highest-priority unblocked issue for today and ask for confirmation before implementation.
-14. Implement only one issue at a time by default.
-15. Continue an existing branch or PR when it clearly maps to the same issue. Otherwise create a fresh branch from the default branch using `codex/<issue-number>-<slug>`.
-16. If GitHub is unavailable, degrade cleanly to planner-side local drafts for issues and PRs without blocking understanding or planning.
-17. Before commit/push/PR creation, stop and ask one final `ship this issue now?` approval.
-18. If approved, create a draft PR using repo templates where present.
+13. If no relevant issues are assigned to the authenticated GitHub user, say so explicitly before falling back to the broader relevant repo issue set.
+14. Present the highest-priority unblocked issue for today and ask for confirmation before implementation.
+15. Implement only one issue at a time by default.
+16. Continue an existing branch or PR when it clearly maps to the same issue. Otherwise create a fresh branch from the default branch using `codex/<issue-number>-<slug>`.
+17. If GitHub is unavailable, degrade cleanly to planner-side local drafts for issues and PRs without blocking understanding or planning.
+18. Before commit/push/PR creation, stop and ask one final `ship this issue now?` approval.
+19. If approved, create a draft PR using repo templates where present.
    - link the issue so it closes on merge, but do not close it immediately
    - assign to the currently authenticated GitHub user by default, with optional override to `kashua14`
    - apply repo-native labels and projects when they clearly exist; otherwise use only the safe minimum metadata
-19. Update the handoff immediately with the current issue, branch, PR, priority, suggested next action, and derived today queue, then stop.
+20. Update the handoff immediately with the current issue, branch, PR, priority, suggested next action, and derived today queue, then stop.
 
 Execution rule:
 - Once the launched Codex session starts, it should execute this workflow immediately instead of restating it. It should ask one question at a time during `grill-me`, keep moving between user gates, and stop only for the approvals that the workflow explicitly requires.
@@ -99,7 +100,7 @@ Use this bootstrap entrypoint one workspace at a time:
    - open issues and PRs first
    - lightweight repo inspection second
 4. If the user provides explicit issue ideas, use `grill-me` to get enough context to create or update GitHub issues first.
-5. Then continue into the canonical workflow above and rank the highest-priority unblocked issue from the full repo issue set.
+5. Then continue into the canonical workflow above and rank the highest-priority unblocked issue from the assigned-to-me issue set first.
 
 ## End-day workflow
 
