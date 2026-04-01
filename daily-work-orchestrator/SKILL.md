@@ -13,19 +13,21 @@ Use this skill to run a repeatable daily loop across many repos and non-git work
 - Keep each tracked workspace's local handoff in `.codex/session-handoff.md`.
 - Use `codex-daily start-day` to analyze all tracked workspaces and propose focus areas.
 - Use `codex-daily end-day` to update handoffs only for active workspaces.
+- If the most recent selected day was never closed out, `start-day` should block and require `end-day` first.
 
 ## Start-day workflow
 
 1. Load the tracked workspace registry from the planner repo.
-2. Gather deterministic evidence for every workspace.
+2. Before proceeding, detect whether the most recent prior selected day is still missing an end-of-day closeout and force `codex-daily end-day` first when it is.
+3. Gather deterministic evidence for every workspace.
    - For git workspaces: branch, git status, changed files, recent commits, previous handoff.
    - For non-git workspaces: existence, previous handoff, planner metadata, and lightweight filesystem signals if configured.
-3. Apply explicit routing rules first to recommend candidate skills.
-4. If a model backend is configured, let it refine summaries, next actions, and skill ranking.
-5. Show a compact summary for every workspace.
-6. Propose a focus shortlist, then let the user approve or edit it interactively.
-7. For workspaces with no existing handoff, switch into the fixed bootstrap pipeline instead of pretending there is prior context.
-8. Automatically start the bootstrap kickoff for one selected no-handoff workspace at a time:
+4. Apply explicit routing rules first to recommend candidate skills.
+5. If a model backend is configured, let it refine summaries, next actions, and skill ranking.
+6. Show a compact summary for every workspace.
+7. Propose a focus shortlist, then let the user approve or edit it interactively.
+8. For workspaces with no existing handoff, switch into the fixed bootstrap pipeline instead of pretending there is prior context.
+9. Automatically start the bootstrap kickoff for one selected no-handoff workspace at a time:
    - ask for the user's top priority
    - if needed, suggest up to 3 strong candidates
    - write a planner-side bootstrap brief
@@ -34,8 +36,8 @@ Use this skill to run a repeatable daily loop across many repos and non-git work
    - instruct the launched Codex session to read the bootstrap brief first and treat it as the source of truth
    - launch Codex directly when the environment is interactive and bootstrap auto-launch is enabled
    - instruct the launched Codex session to begin step 1 immediately and continue step-by-step, only pausing for the user when a step needs input or approval
-9. For selected non-bootstrap workspaces, treat the explicitly chosen workspace as the primary launch target even if dependency expansion adds supporting repos.
-10. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
+10. For selected non-bootstrap workspaces, treat the explicitly chosen workspace as the primary launch target even if dependency expansion adds supporting repos.
+11. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
 
 ## Canonical workflow
 
