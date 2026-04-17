@@ -1,0 +1,158 @@
+---
+name: daily-work-orchestrator
+description: Orchestrates a multi-workspace developer day by resuming from prior handoffs, generating an approval-first daily plan, routing likely Claude skills, and capturing end-of-day handoffs. Use when the user wants start-of-day or end-of-day workflow across multiple repos/workspaces, workspace handoffs, daily planning, skill routing, or a persistent developer planner.
+---
+
+# Daily Work Orchestrator
+
+Use this skill to run a repeatable daily loop across many repos and non-git workspaces without losing context between days.
+
+## Quick start
+
+- Keep the central planner repo as the control plane for the workflow.
+- Keep each tracked workspace's local handoff in `.claude/session-handoff.md`.
+- Use `claude-daily start-day` to analyze all tracked workspaces and propose focus areas.
+- Use `claude-daily end-day` to update handoffs only for active workspaces.
+- If the most recent selected day was never closed out, `start-day` should block and require `end-day` first.
+
+## Start-day workflow
+
+1. Load the tracked workspace registry from the planner repo.
+2. Before proceeding, detect whether the most recent prior selected day is still missing an end-of-day closeout and force `claude-daily end-day` first when it is.
+3. Gather deterministic evidence for every workspace.
+   - For git workspaces: branch, git status, changed files, recent commits, previous handoff.
+   - For non-git workspaces: existence, previous handoff, planner metadata, and lightweight filesystem signals if configured.
+4. Apply explicit routing rules first to recommend candidate skills.
+5. If a model backend is configured, let it refine summaries, next actions, and skill ranking.
+6. Show a compact summary for every workspace.
+7. Propose a focus shortlist, then let the user approve or edit it interactively.
+8. For workspaces with no existing handoff, switch into the fixed bootstrap pipeline instead of pretending there is prior context.
+9. Automatically start the bootstrap kickoff for one selected no-handoff workspace at a time:
+   - ask for the user's top priority
+   - if needed, suggest up to 3 strong candidates
+   - write a planner-side bootstrap brief
+   - store the full chosen problem in that brief so long problem statements are not passed inline to the launch command
+   - generate the launch prompt for the interactive Claude session
+   - instruct the launched Claude session to read the bootstrap brief first and treat it as the source of truth
+   - launch Claude Code directly when the environment is interactive and bootstrap auto-launch is enabled
+   - instruct the launched Claude session to begin step 1 immediately and continue step-by-step, only pausing for the user when a step needs input or approval
+10. For selected non-bootstrap workspaces, treat the explicitly chosen workspace as the primary launch target even if dependency expansion adds supporting repos.
+11. Write the central daily dashboard and refresh the recommended start prompt inside each selected workspace handoff. Do not create a fake local handoff for a no-handoff workspace before the issue set is confirmed.
+
+## Canonical workflow
+
+Apply the same workflow to both handoff and no-handoff repos, but with different entrypoints.
+
+- With handoff:
+  - start from the recorded issue queue, current issue, branch, PR, and next action
+  - inspect existing open issues and PRs first
+  - if the user states a new problem, compare it against the current queue and recommend whether to override
+- Without handoff:
+  - bootstrap from zero using the no-handoff path below
+
+Default execution model:
+
+1. Start from the user-stated problem if they give one. If they do not, inspect the repo and use judgment.
+2. Use `grill-me` to sharpen the problem one question at a time until the problem and intended outcome are clear.
+   - if the user came in with one or more explicit issues, gather enough context to turn them into GitHub issues first
+3. Inspect the repo and existing open work.
+   - prioritize unfinished existing issues and PRs first
+   - reuse and update existing relevant issues before creating new ones
+4. If the work is a larger feature, ambiguous initiative, or needs clearer scope, use `write-a-prd`.
+5. If the work is one safe vertical slice, use `triage-issue`.
+6. If the work is larger than one safe vertical slice, use `prd-to-issues`. If a PRD was needed, derive the issue set from that PRD.
+7. Draft the issue set first using repo templates if present.
+   - use strict lookup order: repo-local templates, repo conventions, planner fallback, then structured custom draft
+   - update existing issue bodies in place as the canonical plan; add a short change-note comment only when context changed materially
+8. Apply priorities using `P0` to `P3`.
+   - `P0`: urgent blocker
+   - `P1`: top issue for today
+   - `P2`: important but not first today
+   - `P3`: backlog/later
+9. Present the issue set and priority updates for confirmation before creating or updating GitHub issues.
+10. Create or update issues only after approval.
+11. Maintain a planner-side today queue as a derived view, not a separate source of truth.
+12. After issue creation or update, rank across relevant GitHub issues assigned to the authenticated GitHub user first with this ordered rule set:
+   - `P0` beats everything
+   - unblocks other work beats isolated work
+   - existing branch or PR continuation beats brand-new work
+   - user-stated problem can override with explicit confirmation
+   - otherwise use workspace priority
+13. If no relevant issues are assigned to the authenticated GitHub user, say so explicitly before falling back to the broader relevant repo issue set.
+14. Present the highest-priority unblocked issue for today and ask for confirmation before implementation.
+15. Implement only one issue at a time by default.
+16. Continue an existing branch or PR when it clearly maps to the same issue. Otherwise create a fresh branch from the default branch using `claude/<issue-number>-<slug>`.
+17. If GitHub is unavailable, degrade cleanly to planner-side local drafts for issues and PRs without blocking understanding or planning.
+18. Before commit/push/PR creation, stop and ask one final `ship this issue now?` approval.
+19. If approved, create a draft PR using repo templates where present.
+   - link the issue so it closes on merge, but do not close it immediately
+   - assign to the currently authenticated GitHub user by default, with optional override to `kashua14`
+   - apply repo-native labels and projects when they clearly exist; otherwise use only the safe minimum metadata
+20. Update the handoff immediately with the current issue, branch, PR, priority, suggested next action, and derived today queue, then stop.
+
+Execution rule:
+- Once the launched Claude session starts, it should execute this workflow immediately instead of restating it. It should ask one question at a time during `grill-me`, keep moving between user gates, and stop only for the approvals that the workflow explicitly requires.
+
+## No-handoff bootstrap workflow
+
+Use this bootstrap entrypoint one workspace at a time:
+
+1. Do a lightweight scan.
+2. Ask for the user's top issue, issues, or feature in the workspace.
+3. If the user has no clear priority, suggest up to 3 very strong candidates from:
+   - open issues and PRs first
+   - lightweight repo inspection second
+4. If the user provides explicit issue ideas, use `grill-me` to get enough context to create or update GitHub issues first.
+5. Then continue into the canonical workflow above and rank the highest-priority unblocked issue from the assigned-to-me issue set first.
+
+## End-day workflow
+
+1. Read today's dashboard to recover the morning selection.
+2. Detect active workspaces from planner signals plus filesystem signals.
+3. Review only active workspaces by default, with an optional quick pass over the rest.
+4. Draft the handoff from evidence, then ask the user for a very short confirmation or edit:
+   - where they stopped
+   - next action
+   - blockers
+   - short session notes
+5. Write `.claude/session-handoff.md` for each reviewed workspace.
+6. Update planner issues and skill-gap backlog files.
+
+## Routing rules
+
+- Prefer explicit routing rules over pure model judgment.
+- Recommend only the skills that match the workspace evidence.
+- Surface `skill_gap` explicitly when no current skill fits well.
+- Persist candidate new skills and routing improvements in the planner repo backlog.
+
+Typical mappings:
+- failing CI or PR checks -> `gh-fix-ci`
+- review feedback or requested changes -> `gh-address-comments`
+- clear implementation slice -> `tdd`
+- architecture uncertainty or shallow modules -> `improve-codebase-architecture`
+- notes or research workspace -> `obsidian-vault`
+- recurring new workflow need -> `write-a-skill`
+
+## Files
+
+- Planner repo:
+  - `workspaces.yaml`
+  - `config.yaml`
+  - `skill-routing.yaml`
+  - `days/YYYY-MM-DD.md`
+  - `planner-issues.md`
+  - `skill-backlog.md`
+- Per workspace:
+  - `.claude/session-handoff.md`
+
+`workspaces.yaml` may also include:
+- `group` for related repos such as `ucu`
+- `depends_on` for ordered cross-repo flows such as `ucu-ui` depending on `ucu-api`
+
+## Guardrails
+
+- The workflow is approval-first.
+- `start-day` may launch a Claude bootstrap session automatically when configured to do so.
+- `end-day` updates files only; it does not stage, commit, or push git changes.
+- Missing or inaccessible workspaces are planner errors, not silent skips.
+- Keep `workspaces.yaml` manual. Only derived planner artifacts should update automatically.
